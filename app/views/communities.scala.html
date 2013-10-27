@@ -1,0 +1,18 @@
+@(main: io.prismic.Document, communities: java.util.List[io.prismic.Document])
+
+@page(id = "communities")(
+  title = Option(main.getText("article.title")), 
+  image = Option(main.getImage("article.illustration", "wide")).map(_.getUrl()), 
+  catcher = Option(main.getHtml("article.shortlede", prismic.getLinkResolver())).map(Html.apply)) {
+
+  @Option(main.getHtml("article.content", prismic.getLinkResolver())).map(Html.apply)
+
+  @communities.sortBy(_.getText("community.name")).map { community => 
+ 
+    <article class="store" style="@Option(community.getImage("community.logo", "wide")).map { img => background-image: url(@img.getUrl()) }">
+      <a href="@routes.Application.communityDetail(community.getId(), community.getSlug(), prismic.maybeRef())"><h3>@community.getText("community.name")</h3></a>
+    </article>
+
+  }
+
+}

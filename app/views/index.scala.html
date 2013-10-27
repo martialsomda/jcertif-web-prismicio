@@ -1,0 +1,64 @@
+@(events: java.util.List[io.prismic.Document], projects: java.util.List[io.prismic.Document], sponsors: java.util.List[io.prismic.Document])
+
+@main(id = "home") {
+
+  <section id="caroussel">
+
+    <nav>
+      <ul>
+        @for(enventType <- Application.JCertifEventTypes.values()) {
+           <li><a>@enventType</a></li>
+        }
+      </ul>
+    </nav>
+
+    <div class="products">
+
+      @for(enventType <- Application.JCertifEventTypes.keys) {
+        <ul>
+          @events.filter(_.getTags().contains(enventType)).take(5).map { conference =>
+            <li data-category="@enventType">
+              <a href="@routes.Application.eventDetail(conference.getId(), conference.getSlug(), prismic.maybeRef())">
+                <img src="@(Option(conference.getImage("conference.image", "icon")).map(_.getUrl()).getOrElse(routes.Assets.at("images/logoJCertifConference.jpg")))">
+                <span>@Option(conference.getText("conference.name")).getOrElse("JCertif Event")</span>
+                
+              </a>
+            </li>
+          }
+        </ul>
+      }
+
+    </div>
+    
+    <p>
+      <a href="@routes.Application.events(prismic.maybeRef())">See All JCertif Community Events</a>
+    </p>
+
+  </section>
+  
+  <section id="featured">
+
+
+      @projects.filter(_.getType() == "project").take(5).map { project =>
+        <div style="@Option(project.getImage("project.logo", "wide")).map { img => background-image: url(@img.getUrl()); }">
+          <a href="@routes.Application.projectDetail(project.getId(), project.getSlug(), prismic.maybeRef())">
+            <h3><span>@Option(project.getText("project.name")).getOrElse("JCertif Global Project")</span></h3>
+          </a>
+        </div>
+      }
+
+  </section>
+  
+  <section id="blog">
+
+    <h2>Our Global Sponsors</h2>
+    
+     @sponsors.filter(_.getType() == "sponsor").map { sponsor =>
+        <a href="@Option(sponsor.getText("sponsor.website")).getOrElse("_blank")">
+	        <img src="@(Option(sponsor.getImage("sponsor.logo", "icon")).map(_.getUrl()).getOrElse(routes.Assets.at("images/missing-image.png")))">
+	      </a>
+      }
+      
+  </section>
+
+}

@@ -1,0 +1,30 @@
+@(events: java.util.List[io.prismic.Document], title: String)
+
+@main(id = "products", title = Some("JCertif Events")) {
+
+  <section id="catalog">
+
+    @Option(title).map { txt => <h1>@txt</h1> }
+  
+    <div class="products">
+    
+      <ul>
+        @events.sortBy(_.getText("conference.date_beginning")).map { conference =>
+          <li data-category="@conference.getTags().filter(Application.JCertifEventTypes.contains).headOption">
+            <a href="@routes.Application.eventDetail(conference.getId(), conference.getSlug(), prismic.maybeRef())">
+              <img src="@(Option(conference.getImage("conference.image", "icon")).map(_.getUrl()).getOrElse(routes.Assets.at("images/logoJCertifConference.jpg")))">
+              <span>@Option(conference.getText("conference.name")).getOrElse("JCertif Event")</span>
+            </a>
+          </li>
+        }
+      </ul>
+
+    </div>
+
+    <p>
+      <a href="@routes.Application.index(prismic.maybeRef())">Back to home</a>
+    </p>
+
+  </section>
+
+}
